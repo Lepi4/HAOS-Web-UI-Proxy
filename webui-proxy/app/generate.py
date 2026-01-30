@@ -6,6 +6,7 @@ from urllib.parse import urlparse
 OPTIONS_PATH = "/data/options.json"
 NGINX_CONF_PATH = "/etc/nginx/nginx.conf"
 HTML_PATH = "/app/html/index.html"
+HTTPS_PORTS = {443, 8443, 8006}
 
 
 def _parse_target(raw):
@@ -38,6 +39,8 @@ def _parse_target(raw):
                 return None
         else:
             host = host_port
+        if port in HTTPS_PORTS:
+            scheme = "https"
 
     host = host.strip()
     if not host:
@@ -78,7 +81,7 @@ def _render_index(targets):
     else:
         items = []
         for idx, target in enumerate(targets, start=1):
-            label = target.get('name', f"{target['host']}:{target['port']}")
+            label = target.get("name", f"{target['host']}:{target['port']}")
             items.append(
                 f"<li><a href=\"proxy/{idx}/\">{html.escape(label)}</a></li>"
             )
