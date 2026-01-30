@@ -16,6 +16,10 @@
 
 - Sync restored targets back to Home Assistant options UI.
 
+## 0.1.18
+
+- Add url constructor shim for legacy frontends.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
