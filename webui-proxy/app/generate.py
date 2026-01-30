@@ -152,33 +152,127 @@ def _write_backup(targets):
 
 
 def _render_index(targets):
-    if not targets:
-        body = "<p>Добавьте устройства в настройках аддона.</p>"
-    else:
-        items = []
-        for idx, target in enumerate(targets, start=1):
-            label = target.get("name", f"{target['host']}:{target['port']}")
-            items.append(
-                f"<li><a href=\"proxy/{idx}/\">{html.escape(label)}</a></li>"
-            )
-        body = "<ul>" + "\n".join(items) + "</ul>"
+        if not targets:
+                body = "<p class=\"empty\">Добавьте устройства в настройках аддона.</p>"
+        else:
+                items = []
+                for idx, target in enumerate(targets, start=1):
+                        label = target.get("name", f"{target['host']}:{target['port']}")
+                        items.append(
+                                """
+                                <li class="card">
+                                    <a class="card-link" href="proxy/{idx}/">
+                                        <span class="card-title">{label}</span>
+                                        <span class="card-sub">{raw}</span>
+                                    </a>
+                                </li>
+                                """.format(
+                                        idx=idx,
+                                        label=html.escape(label),
+                                        raw=html.escape(target.get("raw", "")),
+                                )
+                        )
+                body = "<ul class=\"grid\">" + "\n".join(items) + "</ul>"
 
-    return f"""<!doctype html>
+        return f"""<!doctype html>
 <html lang=\"ru\">
-  <head>
-    <meta charset=\"utf-8\" />
-    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
-    <title>Web UI Proxy</title>
-    <style>
-      body {{ font-family: Arial, sans-serif; padding: 20px; }}
-      ul {{ padding-left: 20px; }}
-      a {{ text-decoration: none; }}
-    </style>
-  </head>
-  <body>
-    <h1>Web UI Proxy</h1>
-    {body}
-  </body>
+    <head>
+        <meta charset=\"utf-8\" />
+        <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
+        <title>Web UI Proxy</title>
+        <style>
+            :root {{
+                color-scheme: light dark;
+                --bg: #f5f6f8;
+                --card: #ffffff;
+                --text: #1f2430;
+                --muted: #7c8596;
+                --accent: #3b82f6;
+                --border: #e6e8ee;
+            }}
+            @media (prefers-color-scheme: dark) {{
+                :root {{
+                    --bg: #0f1115;
+                    --card: #1a1f2b;
+                    --text: #f4f6fb;
+                    --muted: #9aa3b2;
+                    --accent: #60a5fa;
+                    --border: #2a3040;
+                }}
+            }}
+            * {{ box-sizing: border-box; }}
+            body {{
+                margin: 0;
+                font-family: "Inter", "Segoe UI", Arial, sans-serif;
+                background: var(--bg);
+                color: var(--text);
+            }}
+            header {{
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 20px 24px;
+                border-bottom: 1px solid var(--border);
+                background: var(--card);
+                position: sticky;
+                top: 0;
+                z-index: 10;
+            }}
+            header h1 {{
+                margin: 0;
+                font-size: 20px;
+                font-weight: 600;
+            }}
+            .back {{
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                text-decoration: none;
+                color: var(--accent);
+                font-weight: 600;
+            }}
+            main {{ padding: 24px; }}
+            .grid {{
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 16px;
+            }}
+            .card {{
+                background: var(--card);
+                border: 1px solid var(--border);
+                border-radius: 12px;
+                box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+                transition: transform 0.15s ease, box-shadow 0.15s ease;
+            }}
+            .card:hover {{
+                transform: translateY(-2px);
+                box-shadow: 0 10px 20px rgba(15, 23, 42, 0.14);
+            }}
+            .card-link {{
+                display: flex;
+                flex-direction: column;
+                padding: 16px;
+                gap: 6px;
+                text-decoration: none;
+                color: inherit;
+            }}
+            .card-title {{ font-weight: 600; }}
+            .card-sub {{ font-size: 12px; color: var(--muted); word-break: break-all; }}
+            .empty {{ color: var(--muted); }}
+        </style>
+    </head>
+    <body>
+        <header>
+            <h1>Web UI Proxy</h1>
+            <a class=\"back\" href=\"/\">← Назад в Home Assistant</a>
+        </header>
+        <main>
+            {body}
+        </main>
+    </body>
 </html>"""
 
 
@@ -271,6 +365,7 @@ def _render_nginx_conf(targets):
             sub_filter "__webpack_require__.p='/" "__webpack_require__.p='$http_x_ingress_path{prefix}/";
             sub_filter 'publicPath:"/' 'publicPath:"$http_x_ingress_path{prefix}/';
             sub_filter "publicPath:'/" "publicPath:'$http_x_ingress_path{prefix}/";
+            sub_filter '<body>' '<body><a href="$http_x_ingress_path/" style="position:fixed;top:12px;left:12px;z-index:2147483647;background:#111827;color:#fff;padding:8px 12px;border-radius:8px;text-decoration:none;font-family:Arial,sans-serif;font-size:13px;box-shadow:0 6px 16px rgba(0,0,0,.2)">← В HA</a>';
             sub_filter '<head>' '<head><base href="$http_x_ingress_path{prefix}/"><script>(function(){{var base="$http_x_ingress_path{prefix}/";window.__ingress_base=base;try{{if(!window.url){{window.url=function(){{return new URL(...arguments);}};}}if(window.URL){{window.url.prototype=window.URL.prototype;window.url.URL=window.URL;}}}}catch(e){{}}function fix(u){{try{{if(!u)return u;if(typeof u==="string"){{if(u.indexOf(base)===0)return u;if(u[0]==="/")return base+u.slice(1);var m=u.match(/^(https?:\/\/|wss?:\/\/)([^/]+)\/(.*)/);if(m&&m[2]===location.host){{return m[1]+m[2]+base+m[3];}}}}return u;}}catch(e){{return u;}}}}var _f=window.fetch;if(_f){{window.fetch=function(input,init){{return _f.call(this,fix(input),init);}};}}var _o=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(method,url){{return _o.apply(this,[method,fix(url)].concat([].slice.call(arguments,2)));}};var _ws=window.WebSocket;if(_ws){{window.WebSocket=function(url,protocols){{return protocols!==undefined?new _ws(fix(url),protocols):new _ws(fix(url));}};window.WebSocket.prototype=_ws.prototype;}}try{{var _set=Element.prototype.setAttribute;Element.prototype.setAttribute=function(name,value){{if(name==="src"||name==="href"){{return _set.call(this,name,fix(value));}}return _set.call(this,name,value);}};var sd=Object.getOwnPropertyDescriptor(HTMLScriptElement.prototype,"src");if(sd&&sd.set){{Object.defineProperty(HTMLScriptElement.prototype,"src",{{set:function(v){{return sd.set.call(this,fix(v));}},get:sd.get}});}}var ld=Object.getOwnPropertyDescriptor(HTMLLinkElement.prototype,"href");if(ld&&ld.set){{Object.defineProperty(HTMLLinkElement.prototype,"href",{{set:function(v){{return ld.set.call(this,fix(v));}},get:ld.get}});}}}}catch(e){{}}}})();</script>';
             {ssl_block}
             rewrite ^{prefix}/(.*)$ /$1 break;

@@ -48,6 +48,10 @@
 
 - Use default target for asset fallbacks when only one target is configured.
 
+## 0.1.26
+
+- Improve index UI and add back button in proxied pages.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
