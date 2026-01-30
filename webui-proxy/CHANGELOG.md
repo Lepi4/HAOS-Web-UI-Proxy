@@ -52,6 +52,10 @@
 
 - Improve index UI and add back button in proxied pages.
 
+## 0.1.27
+
+- Rewrite font URLs without leading slashes and ensure back button is injected.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
