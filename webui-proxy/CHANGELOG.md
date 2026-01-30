@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.9
+
+- Restore targets when only default placeholder is present.
+- Rewrite absolute URLs with host to Ingress path.
+
 ## 0.1.8
 
 - Restore targets from /share into options when empty.

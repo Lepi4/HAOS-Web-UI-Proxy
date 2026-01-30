@@ -8,6 +8,10 @@ BACKUP_PATH = "/share/webui-proxy.json"
 NGINX_CONF_PATH = "/etc/nginx/nginx.conf"
 HTML_PATH = "/app/html/index.html"
 HTTPS_PORTS = {443, 8443, 8006}
+DEFAULT_TARGETS = [
+    {"name": "Мое устройство", "url": "192.168.1.10"},
+    "192.168.1.10",
+]
 
 
 def _load_json(path):
@@ -72,9 +76,19 @@ def _parse_target(raw):
     }
 
 
+def _is_default_targets(targets):
+    if not targets:
+        return False
+    if len(targets) != 1:
+        return False
+    return targets[0] in DEFAULT_TARGETS
+
+
 def _load_targets():
     data = _load_json(OPTIONS_PATH) or {}
     targets = data.get("targets", []) or []
+    if _is_default_targets(targets):
+        targets = []
     if not targets:
         backup = _load_json(BACKUP_PATH) or {}
         targets = backup.get("targets", []) or []
@@ -172,6 +186,12 @@ def _render_nginx_conf(targets):
             sub_filter "url('/" "url('$http_x_ingress_path{prefix}/";
             sub_filter '"/api/' '"$http_x_ingress_path{prefix}/api/';
             sub_filter "'/api/" "'$http_x_ingress_path{prefix}/api/";
+            sub_filter 'http://{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
+            sub_filter 'https://{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
+            sub_filter '//{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
+            sub_filter 'http://{target['host']}/' '$http_x_ingress_path{prefix}/';
+            sub_filter 'https://{target['host']}/' '$http_x_ingress_path{prefix}/';
+            sub_filter '//{target['host']}/' '$http_x_ingress_path{prefix}/';
             sub_filter '<head>' '<head><base href="$http_x_ingress_path{prefix}/">';
             {ssl_block}
             rewrite ^{prefix}/(.*)$ /$1 break;
