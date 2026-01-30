@@ -32,6 +32,10 @@
 
 - Rewrite unquoted URLs and webpack publicPath for chunks/assets.
 
+## 0.1.22
+
+- Rewrite DOM src/href assignments for scripts and links.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.

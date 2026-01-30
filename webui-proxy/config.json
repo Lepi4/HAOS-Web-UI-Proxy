@@ -1,6 +1,6 @@
 {
   "name": "Web UI Proxy",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "slug": "webui-proxy",
   "description": "Проксирование локальных веб-интерфейсов через Home Assistant Ingress",
   "url": "https://github.com/Lepi4/HAOS-Web-UI-Proxy",
