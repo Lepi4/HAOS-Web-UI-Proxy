@@ -4,9 +4,17 @@ import os
 from urllib.parse import urlparse
 
 OPTIONS_PATH = "/data/options.json"
+BACKUP_PATH = "/share/webui-proxy.json"
 NGINX_CONF_PATH = "/etc/nginx/nginx.conf"
 HTML_PATH = "/app/html/index.html"
 HTTPS_PORTS = {443, 8443, 8006}
+
+
+def _load_json(path):
+    if not os.path.exists(path):
+        return None
+    with open(path, "r", encoding="utf-8") as file:
+        return json.load(file)
 
 
 def _parse_target(raw):
@@ -59,13 +67,11 @@ def _parse_target(raw):
 
 
 def _load_targets():
-    if not os.path.exists(OPTIONS_PATH):
-        return []
-
-    with open(OPTIONS_PATH, "r", encoding="utf-8") as file:
-        data = json.load(file)
-
-    targets = data.get("targets", [])
+    data = _load_json(OPTIONS_PATH) or {}
+    targets = data.get("targets", []) or []
+    if not targets:
+        backup = _load_json(BACKUP_PATH) or {}
+        targets = backup.get("targets", []) or []
     parsed_targets = []
     for item in targets:
         parsed = _parse_target(item)
@@ -73,6 +79,21 @@ def _load_targets():
             parsed_targets.append(parsed)
 
     return parsed_targets
+
+
+def _write_backup(targets):
+    os.makedirs(os.path.dirname(BACKUP_PATH), exist_ok=True)
+    payload = {
+        "targets": [
+            {
+                "name": target.get("name", ""),
+                "url": target.get("raw", ""),
+            }
+            for target in targets
+        ]
+    }
+    with open(BACKUP_PATH, "w", encoding="utf-8") as file:
+        json.dump(payload, file, ensure_ascii=False, indent=2)
 
 
 def _render_index(targets):
@@ -185,6 +206,7 @@ http {{
 
 def main():
     targets = _load_targets()
+    _write_backup(targets)
 
     os.makedirs(os.path.dirname(HTML_PATH), exist_ok=True)
     with open(HTML_PATH, "w", encoding="utf-8") as file:

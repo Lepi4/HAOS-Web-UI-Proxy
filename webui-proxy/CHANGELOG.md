@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.5
+
+- Backup targets to /share/webui-proxy.json and restore if options are empty.
+
 ## 0.1.4
 
 - Fix absolute paths behind Ingress (sub_filter + cookie path).
