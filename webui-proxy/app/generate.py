@@ -221,7 +221,7 @@ def _render_nginx_conf(targets):
             sub_filter 'http://{target['host']}/' '$http_x_ingress_path{prefix}/';
             sub_filter 'https://{target['host']}/' '$http_x_ingress_path{prefix}/';
             sub_filter '//{target['host']}/' '$http_x_ingress_path{prefix}/';
-            sub_filter '<head>' '<head><base href="$http_x_ingress_path{prefix}/">';
+            sub_filter '<head>' '<head><base href="$http_x_ingress_path{prefix}/"><script>var url="$http_x_ingress_path{prefix}/";</script>';
             {ssl_block}
             rewrite ^{prefix}/(.*)$ /$1 break;
             proxy_pass {proxy_pass};

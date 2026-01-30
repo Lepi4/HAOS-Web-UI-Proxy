@@ -4,6 +4,10 @@
 
 - Add referer-based fallback proxy routes for absolute asset/API paths.
 
+## 0.1.15
+
+- Inject global url variable for UIs relying on it.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
