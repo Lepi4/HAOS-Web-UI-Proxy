@@ -8,6 +8,10 @@
 
 - Inject global url variable for UIs relying on it.
 
+## 0.1.16
+
+- Provide url constructor alias for legacy UI code.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
