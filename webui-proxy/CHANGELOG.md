@@ -56,6 +56,10 @@
 
 - Rewrite font URLs without leading slashes and ensure back button is injected.
 
+## 0.1.28
+
+- Add fallback proxy for /styles assets (font paths).
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
