@@ -24,6 +24,10 @@
 
 - Inject runtime URL rewrites for absolute paths and WebSocket.
 
+## 0.1.20
+
+- Fix nginx config parsing for injected runtime script.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
