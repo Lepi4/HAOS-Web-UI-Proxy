@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.8
+
+- Restore targets from /share into options when empty.
+- Inject base href to improve SPA rendering.
+
 ## 0.1.7
 
 - Use ingress path in rewritten URLs, cookies, and redirects.

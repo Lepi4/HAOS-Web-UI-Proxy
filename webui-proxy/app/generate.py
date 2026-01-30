@@ -17,6 +17,12 @@ def _load_json(path):
         return json.load(file)
 
 
+def _write_json(path, payload):
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    with open(path, "w", encoding="utf-8") as file:
+        json.dump(payload, file, ensure_ascii=False, indent=2)
+
+
 def _parse_target(raw):
     if isinstance(raw, dict):
         name = raw.get("name", "").strip()
@@ -72,6 +78,8 @@ def _load_targets():
     if not targets:
         backup = _load_json(BACKUP_PATH) or {}
         targets = backup.get("targets", []) or []
+        if targets:
+            _write_json(OPTIONS_PATH, {"targets": targets})
     parsed_targets = []
     for item in targets:
         parsed = _parse_target(item)
@@ -84,7 +92,6 @@ def _load_targets():
 def _write_backup(targets):
     if not targets:
         return
-    os.makedirs(os.path.dirname(BACKUP_PATH), exist_ok=True)
     payload = {
         "targets": [
             {
@@ -94,8 +101,7 @@ def _write_backup(targets):
             for target in targets
         ]
     }
-    with open(BACKUP_PATH, "w", encoding="utf-8") as file:
-        json.dump(payload, file, ensure_ascii=False, indent=2)
+    _write_json(BACKUP_PATH, payload)
 
 
 def _render_index(targets):
@@ -166,6 +172,7 @@ def _render_nginx_conf(targets):
             sub_filter "url('/" "url('$http_x_ingress_path{prefix}/";
             sub_filter '"/api/' '"$http_x_ingress_path{prefix}/api/';
             sub_filter "'/api/" "'$http_x_ingress_path{prefix}/api/";
+            sub_filter '<head>' '<head><base href="$http_x_ingress_path{prefix}/">';
             {ssl_block}
             rewrite ^{prefix}/(.*)$ /$1 break;
             proxy_pass {proxy_pass};
