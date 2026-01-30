@@ -8,22 +8,28 @@ NGINX_CONF_PATH = "/etc/nginx/nginx.conf"
 HTML_PATH = "/app/html/index.html"
 
 
-def _parse_target(raw: str):
-    raw = (raw or "").strip()
-    if not raw:
+def _parse_target(raw):
+    if isinstance(raw, dict):
+        name = raw.get("name", "").strip()
+        url = raw.get("url", "").strip()
+    else:
+        name = ""
+        url = (raw or "").strip()
+
+    if not url:
         return None
 
     scheme = "http"
     host = ""
     port = 80
 
-    if "://" in raw:
-        parsed = urlparse(raw)
+    if "://" in url:
+        parsed = urlparse(url)
         scheme = parsed.scheme or "http"
         host = parsed.hostname or ""
         port = parsed.port or (443 if scheme == "https" else 80)
     else:
-        host_port = raw.split("/", 1)[0]
+        host_port = url.split("/", 1)[0]
         if ":" in host_port:
             host, port_str = host_port.rsplit(":", 1)
             try:
@@ -37,8 +43,12 @@ def _parse_target(raw: str):
     if not host:
         return None
 
+    if not name:
+        name = f"{host}:{port}"
+
     return {
-        "raw": raw,
+        "name": name,
+        "raw": url,
         "scheme": scheme,
         "host": host,
         "port": port,
@@ -55,8 +65,6 @@ def _load_targets():
     targets = data.get("targets", [])
     parsed_targets = []
     for item in targets:
-        if not isinstance(item, str):
-            continue
         parsed = _parse_target(item)
         if parsed:
             parsed_targets.append(parsed)
@@ -66,11 +74,11 @@ def _load_targets():
 
 def _render_index(targets):
     if not targets:
-        body = "<p>Добавьте IP-адреса в настройках аддона.</p>"
+        body = "<p>Добавьте устройства в настройках аддона.</p>"
     else:
         items = []
         for idx, target in enumerate(targets, start=1):
-            label = f"{target['host']}:{target['port']}"
+            label = target.get('name', f"{target['host']}:{target['port']}")
             items.append(
                 f"<li><a href=\"proxy/{idx}/\">{html.escape(label)}</a></li>"
             )
