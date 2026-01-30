@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.14
+
+- Add referer-based fallback proxy routes for absolute asset/API paths.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.

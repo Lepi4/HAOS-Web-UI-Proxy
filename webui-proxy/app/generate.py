@@ -151,6 +151,24 @@ def _render_index(targets):
 
 def _render_nginx_conf(targets):
     locations = []
+    referer_map = [
+        "    map $http_referer $proxy_target {",
+        "        default \"\";",
+    ]
+    referer_host_map = [
+        "    map $http_referer $proxy_host {",
+        "        default \"\";",
+    ]
+    for idx, target in enumerate(targets, start=1):
+        referer_map.append(
+            f"        ~*/proxy/{idx}/ {target['scheme']}://{target['host']}:{target['port']};"
+        )
+        referer_host_map.append(
+            f"        ~*/proxy/{idx}/ {target['host']}:{target['port']};"
+        )
+    referer_map.append("    }")
+    referer_host_map.append("    }")
+    referer_map_block = "\n".join(referer_map + [""] + referer_host_map)
     for idx, target in enumerate(targets, start=1):
         proxy_pass = f"{target['scheme']}://{target['host']}:{target['port']}/"
         prefix = f"/proxy/{idx}"
@@ -178,7 +196,7 @@ def _render_nginx_conf(targets):
             proxy_redirect ~^(https?://[^/]+)?(/.*)$ $http_x_ingress_path{prefix}$2;
             proxy_cookie_path / $http_x_ingress_path{prefix}/;
             sub_filter_once off;
-            sub_filter_types text/html text/css application/javascript application/json;
+            sub_filter_types text/html text/css;
             sub_filter 'href="/' 'href="$http_x_ingress_path{prefix}/';
             sub_filter 'src="/' 'src="$http_x_ingress_path{prefix}/';
             sub_filter 'action="/' 'action="$http_x_ingress_path{prefix}/';
@@ -197,10 +215,6 @@ def _render_nginx_conf(targets):
             sub_filter "'/scripts/" "'$http_x_ingress_path{prefix}/scripts/";
             sub_filter '"/glyphicons-' '"$http_x_ingress_path{prefix}/glyphicons-';
             sub_filter "'/glyphicons-" "'$http_x_ingress_path{prefix}/glyphicons-";
-            sub_filter '/scripts/' '$http_x_ingress_path{prefix}/scripts/';
-            sub_filter '/glyphicons-' '$http_x_ingress_path{prefix}/glyphicons-';
-            sub_filter 'o.p="/' 'o.p="$http_x_ingress_path{prefix}/';
-            sub_filter "o.p='/" "o.p='$http_x_ingress_path{prefix}/";
             sub_filter 'http://{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
             sub_filter 'https://{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
             sub_filter '//{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
@@ -237,6 +251,8 @@ http {{
         '' close;
     }}
 
+{referer_map_block}
+
     server {{
         listen 8080;
         server_name _;
@@ -246,6 +262,78 @@ http {{
 
         location = / {{
             try_files /index.html =404;
+        }}
+
+        location /scripts/ {{
+            if ($proxy_target = "") {{ return 404; }}
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $proxy_host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+            proxy_buffering off;
+            proxy_ssl_server_name on;
+            proxy_ssl_verify off;
+            proxy_pass $proxy_target;
+        }}
+
+        location /glyphicons- {{
+            if ($proxy_target = "") {{ return 404; }}
+            proxy_http_version 1.1;
+            proxy_set_header Host $proxy_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_ssl_server_name on;
+            proxy_ssl_verify off;
+            proxy_pass $proxy_target;
+        }}
+
+        location /rpc/ {{
+            if ($proxy_target = "") {{ return 404; }}
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $proxy_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+            proxy_buffering off;
+            proxy_ssl_server_name on;
+            proxy_ssl_verify off;
+            proxy_pass $proxy_target;
+        }}
+
+        location /api/ {{
+            if ($proxy_target = "") {{ return 404; }}
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $proxy_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+            proxy_buffering off;
+            proxy_ssl_server_name on;
+            proxy_ssl_verify off;
+            proxy_pass $proxy_target;
+        }}
+
+        location /ws/ {{
+            if ($proxy_target = "") {{ return 404; }}
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $proxy_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+            proxy_buffering off;
+            proxy_ssl_server_name on;
+            proxy_ssl_verify off;
+            proxy_pass $proxy_target;
         }}
 
         {''.join(locations)}
