@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.13
+
+- Rewrite unquoted /scripts and /glyphicons paths.
+
 ## 0.1.12
 
 - Rewrite /scripts and glyphicon asset paths for Wirenboard UI.

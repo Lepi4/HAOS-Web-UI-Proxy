@@ -197,6 +197,8 @@ def _render_nginx_conf(targets):
             sub_filter "'/scripts/" "'$http_x_ingress_path{prefix}/scripts/";
             sub_filter '"/glyphicons-' '"$http_x_ingress_path{prefix}/glyphicons-';
             sub_filter "'/glyphicons-" "'$http_x_ingress_path{prefix}/glyphicons-";
+            sub_filter '/scripts/' '$http_x_ingress_path{prefix}/scripts/';
+            sub_filter '/glyphicons-' '$http_x_ingress_path{prefix}/glyphicons-';
             sub_filter 'o.p="/' 'o.p="$http_x_ingress_path{prefix}/';
             sub_filter "o.p='/" "o.p='$http_x_ingress_path{prefix}/";
             sub_filter 'http://{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
