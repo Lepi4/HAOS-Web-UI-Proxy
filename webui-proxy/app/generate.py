@@ -169,6 +169,9 @@ def _render_nginx_conf(targets):
             proxy_set_header X-Forwarded-Proto $scheme;
             proxy_set_header X-Forwarded-Prefix $http_x_ingress_path{prefix};
             proxy_set_header Accept-Encoding "";
+            proxy_hide_header X-Frame-Options;
+            proxy_hide_header Content-Security-Policy;
+            proxy_hide_header X-Content-Security-Policy;
             proxy_read_timeout 3600s;
             proxy_send_timeout 3600s;
             proxy_buffering off;
@@ -186,6 +189,10 @@ def _render_nginx_conf(targets):
             sub_filter "url('/" "url('$http_x_ingress_path{prefix}/";
             sub_filter '"/api/' '"$http_x_ingress_path{prefix}/api/';
             sub_filter "'/api/" "'$http_x_ingress_path{prefix}/api/";
+            sub_filter '"/rpc/' '"$http_x_ingress_path{prefix}/rpc/';
+            sub_filter "'/rpc/" "'$http_x_ingress_path{prefix}/rpc/";
+            sub_filter '"/ws/' '"$http_x_ingress_path{prefix}/ws/';
+            sub_filter "'/ws/" "'$http_x_ingress_path{prefix}/ws/";
             sub_filter 'http://{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
             sub_filter 'https://{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
             sub_filter '//{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';

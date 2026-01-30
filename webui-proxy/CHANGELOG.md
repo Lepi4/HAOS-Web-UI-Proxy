@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.10
+
+- Hide frame-blocking headers for embedded UIs.
+- Rewrite /rpc and /ws paths for SPA backends.
+
 ## 0.1.9
 
 - Restore targets when only default placeholder is present.
