@@ -28,6 +28,10 @@
 
 - Fix nginx config parsing for injected runtime script.
 
+## 0.1.21
+
+- Rewrite unquoted URLs and webpack publicPath for chunks/assets.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
