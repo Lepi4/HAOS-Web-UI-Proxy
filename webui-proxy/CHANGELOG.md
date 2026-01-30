@@ -20,6 +20,10 @@
 
 - Add url constructor shim for legacy frontends.
 
+## 0.1.19
+
+- Inject runtime URL rewrites for absolute paths and WebSocket.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
