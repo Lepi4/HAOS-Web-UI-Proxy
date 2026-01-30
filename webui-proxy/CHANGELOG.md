@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.6
+
+- Improve path rewriting for JS/CSS and single-quoted URLs.
+- Add API path rewrites for absolute /api/ calls.
+
 ## 0.1.5
 
 - Backup targets to /share/webui-proxy.json and restore if options are empty.
