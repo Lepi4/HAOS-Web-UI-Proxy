@@ -193,6 +193,8 @@ def _render_nginx_conf(targets):
             sub_filter "'/rpc/" "'$http_x_ingress_path{prefix}/rpc/";
             sub_filter '"/ws/' '"$http_x_ingress_path{prefix}/ws/';
             sub_filter "'/ws/" "'$http_x_ingress_path{prefix}/ws/";
+            sub_filter 'o.p="/' 'o.p="$http_x_ingress_path{prefix}/';
+            sub_filter "o.p='/" "o.p='$http_x_ingress_path{prefix}/";
             sub_filter 'http://{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
             sub_filter 'https://{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';
             sub_filter '//{target['host']}:{target['port']}/' '$http_x_ingress_path{prefix}/';

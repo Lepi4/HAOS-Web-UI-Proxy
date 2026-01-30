@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.11
+
+- Rewrite webpack public path (o.p) to Ingress prefix.
+
 ## 0.1.10
 
 - Hide frame-blocking headers for embedded UIs.
