@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.12
+
+- Rewrite /scripts and glyphicon asset paths for Wirenboard UI.
+
 ## 0.1.11
 
 - Rewrite webpack public path (o.p) to Ingress prefix.
