@@ -184,13 +184,20 @@ def _render_index(targets):
 
 def _render_nginx_conf(targets):
     locations = []
+    default_target = ""
+    default_host = ""
+    if len(targets) == 1:
+        only = targets[0]
+        default_target = f"{only['scheme']}://{only['host']}:{only['port']}"
+        default_host = f"{only['host']}:{only['port']}"
+
     referer_map = [
         "    map $http_referer $proxy_target {",
-        "        default \"\";",
+        f"        default \"{default_target}\";",
     ]
     referer_host_map = [
         "    map $http_referer $proxy_host {",
-        "        default \"\";",
+        f"        default \"{default_host}\";",
     ]
     for idx, target in enumerate(targets, start=1):
         referer_map.append(

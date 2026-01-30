@@ -44,6 +44,10 @@
 
 - Add generic font extension fallback proxy.
 
+## 0.1.25
+
+- Use default target for asset fallbacks when only one target is configured.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
