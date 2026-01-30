@@ -1,6 +1,8 @@
 import html
 import json
 import os
+import urllib.error
+import urllib.request
 from urllib.parse import urlparse
 
 OPTIONS_PATH = "/data/options.json"
@@ -87,6 +89,7 @@ def _is_default_targets(targets):
 def _load_targets():
     data = _load_json(OPTIONS_PATH) or {}
     targets = data.get("targets", []) or []
+    restored = False
     if _is_default_targets(targets):
         targets = []
     if not targets:
@@ -94,13 +97,43 @@ def _load_targets():
         targets = backup.get("targets", []) or []
         if targets:
             _write_json(OPTIONS_PATH, {"targets": targets})
+            restored = True
     parsed_targets = []
     for item in targets:
         parsed = _parse_target(item)
         if parsed:
             parsed_targets.append(parsed)
 
-    return parsed_targets
+    return parsed_targets, restored
+
+
+def _update_supervisor_options(targets):
+    token = os.getenv("SUPERVISOR_TOKEN")
+    if not token:
+        return
+    base_url = os.getenv("SUPERVISOR_URL", "http://supervisor")
+    payload = {
+        "options": {
+            "targets": [
+                {"name": target.get("name", ""), "url": target.get("raw", "")}
+                for target in targets
+            ]
+        }
+    }
+    try:
+        req = urllib.request.Request(
+            f"{base_url}/addons/self/options",
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=10):
+            pass
+    except (urllib.error.URLError, urllib.error.HTTPError, ValueError):
+        return
 
 
 def _write_backup(targets):
@@ -343,8 +376,10 @@ http {{
 
 
 def main():
-    targets = _load_targets()
+    targets, restored = _load_targets()
     _write_backup(targets)
+    if restored:
+        _update_supervisor_options(targets)
 
     os.makedirs(os.path.dirname(HTML_PATH), exist_ok=True)
     with open(HTML_PATH, "w", encoding="utf-8") as file:

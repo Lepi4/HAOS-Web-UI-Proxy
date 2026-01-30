@@ -12,6 +12,10 @@
 
 - Provide url constructor alias for legacy UI code.
 
+## 0.1.17
+
+- Sync restored targets back to Home Assistant options UI.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
