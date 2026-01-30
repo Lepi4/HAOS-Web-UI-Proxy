@@ -334,6 +334,26 @@ http {{
             proxy_pass $proxy_target;
         }}
 
+        location /fontawesome- {{
+            if ($proxy_target = "") {{ return 404; }}
+            proxy_http_version 1.1;
+            proxy_set_header Host $proxy_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_ssl_server_name on;
+            proxy_ssl_verify off;
+            proxy_pass $proxy_target;
+        }}
+
+        location /fonts/ {{
+            if ($proxy_target = "") {{ return 404; }}
+            proxy_http_version 1.1;
+            proxy_set_header Host $proxy_host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_ssl_server_name on;
+            proxy_ssl_verify off;
+            proxy_pass $proxy_target;
+        }}
+
         location /rpc/ {{
             if ($proxy_target = "") {{ return 404; }}
             proxy_http_version 1.1;

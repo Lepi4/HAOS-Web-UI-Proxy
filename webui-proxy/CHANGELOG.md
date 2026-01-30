@@ -36,6 +36,10 @@
 
 - Rewrite DOM src/href assignments for scripts and links.
 
+## 0.1.23
+
+- Add fallback proxy routes for font assets.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
