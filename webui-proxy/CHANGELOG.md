@@ -40,6 +40,10 @@
 
 - Add fallback proxy routes for font assets.
 
+## 0.1.24
+
+- Add generic font extension fallback proxy.
+
 ## 0.1.13
 
 - Rewrite unquoted /scripts and /glyphicons paths.
