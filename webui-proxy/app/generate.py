@@ -82,6 +82,8 @@ def _load_targets():
 
 
 def _write_backup(targets):
+    if not targets:
+        return
     os.makedirs(os.path.dirname(BACKUP_PATH), exist_ok=True)
     payload = {
         "targets": [
@@ -145,25 +147,25 @@ def _render_nginx_conf(targets):
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Prefix {prefix};
+            proxy_set_header X-Forwarded-Prefix $http_x_ingress_path{prefix};
             proxy_set_header Accept-Encoding "";
             proxy_read_timeout 3600s;
             proxy_send_timeout 3600s;
             proxy_buffering off;
-            proxy_redirect ~^(https?://[^/]+)?(/.*)$ {prefix}$2;
-            proxy_cookie_path / {prefix}/;
+            proxy_redirect ~^(https?://[^/]+)?(/.*)$ $http_x_ingress_path{prefix}$2;
+            proxy_cookie_path / $http_x_ingress_path{prefix}/;
             sub_filter_once off;
             sub_filter_types text/html text/css application/javascript application/json;
-            sub_filter 'href="/' 'href="{prefix}/';
-            sub_filter 'src="/' 'src="{prefix}/';
-            sub_filter 'action="/' 'action="{prefix}/';
-            sub_filter "href='/" "href='{prefix}/";
-            sub_filter "src='/" "src='{prefix}/";
-            sub_filter "action='/" "action='{prefix}/";
-            sub_filter 'url("/' 'url("{prefix}/';
-            sub_filter "url('/" "url('{prefix}/";
-            sub_filter '"/api/' '"{prefix}/api/';
-            sub_filter "'/api/" "'{prefix}/api/";
+            sub_filter 'href="/' 'href="$http_x_ingress_path{prefix}/';
+            sub_filter 'src="/' 'src="$http_x_ingress_path{prefix}/';
+            sub_filter 'action="/' 'action="$http_x_ingress_path{prefix}/';
+            sub_filter "href='/" "href='$http_x_ingress_path{prefix}/";
+            sub_filter "src='/" "src='$http_x_ingress_path{prefix}/";
+            sub_filter "action='/" "action='$http_x_ingress_path{prefix}/";
+            sub_filter 'url("/' 'url("$http_x_ingress_path{prefix}/';
+            sub_filter "url('/" "url('$http_x_ingress_path{prefix}/";
+            sub_filter '"/api/' '"$http_x_ingress_path{prefix}/api/';
+            sub_filter "'/api/" "'$http_x_ingress_path{prefix}/api/";
             {ssl_block}
             rewrite ^{prefix}/(.*)$ /$1 break;
             proxy_pass {proxy_pass};

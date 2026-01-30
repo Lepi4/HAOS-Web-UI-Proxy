@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.7
+
+- Use ingress path in rewritten URLs, cookies, and redirects.
+- Do not overwrite backup when targets are empty.
+
 ## 0.1.6
 
 - Improve path rewriting for JS/CSS and single-quoted URLs.
