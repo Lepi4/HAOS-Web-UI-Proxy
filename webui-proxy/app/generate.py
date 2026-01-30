@@ -120,15 +120,23 @@ def _render_nginx_conf(targets):
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
             proxy_set_header Connection $connection_upgrade;
-            proxy_set_header Host {target['host']};
+            proxy_set_header Host {target['host']}:{target['port']};
             proxy_set_header X-Real-IP $remote_addr;
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
             proxy_set_header X-Forwarded-Proto $scheme;
+            proxy_set_header X-Forwarded-Prefix {prefix};
             proxy_set_header Accept-Encoding "";
             proxy_read_timeout 3600s;
             proxy_send_timeout 3600s;
             proxy_buffering off;
-            proxy_redirect ~^(https?://[^/]+)?(/.*)$ $2;
+            proxy_redirect ~^(https?://[^/]+)?(/.*)$ {prefix}$2;
+            proxy_cookie_path / {prefix}/;
+            sub_filter_once off;
+            sub_filter 'href="/' 'href="{prefix}/';
+            sub_filter 'src="/' 'src="{prefix}/';
+            sub_filter 'action="/' 'action="{prefix}/';
+            sub_filter 'url("/' 'url("{prefix}/';
+            sub_filter "url('/" "url('{prefix}/";
             {ssl_block}
             rewrite ^{prefix}/(.*)$ /$1 break;
             proxy_pass {proxy_pass};
