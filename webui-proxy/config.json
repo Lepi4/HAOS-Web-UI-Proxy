@@ -1,0 +1,23 @@
+{
+  "name": "Web UI Proxy",
+  "version": "0.1.0",
+  "slug": "webui-proxy",
+  "description": "Проксирование локальных веб-интерфейсов через Home Assistant Ingress",
+  "url": "https://example.com/webui-proxy-addon",
+  "arch": ["amd64", "aarch64", "armv7", "armhf", "i386"],
+  "startup": "services",
+  "boot": "auto",
+  "init": false,
+  "ingress": true,
+  "ingress_port": 8080,
+  "panel_icon": "mdi:lan",
+  "panel_title": "Web UI Proxy",
+  "options": {
+    "targets": [
+      "192.168.1.10"
+    ]
+  },
+  "schema": {
+    "targets": ["str"]
+  }
+}
